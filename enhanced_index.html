@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Signup</title>
+  <style>
+    :root {
+      --primary: #4e54c8;
+      --secondary: #8f94fb;
+      --bg-light: #f4f4f9;
+      --bg-dark: #1e1e2f;
+      --fg-dark: #fff;
+      --fg-light: #000;
+      --glass: rgba(255, 255, 255, 0.1);
+      --blur: 20px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-light);
+      color: var(--fg-light);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .dark-mode {
+      background: var(--bg-dark);
+      color: var(--fg-dark);
+    }
+
+    .card {
+      width: 90%;
+      max-width: 400px;
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      position: relative;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .dark-mode .card {
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .card h2 {
+      text-align: center;
+      color: var(--primary);
+      animation: fadeIn 1s ease forwards;
+    }
+
+    input, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+
+    input {
+      background: #f0f0f0;
+      transition: background 0.3s;
+    }
+
+    .dark-mode input {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    button {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .toggle, .dark-switch {
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      color: var(--primary);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background: green;
+      color: white;
+      border-radius: 5px;
+      display: none;
+      z-index: 999;
+      animation: slideIn 0.5s forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 id="formTitle">Login</h2>
+    <input type="text" id="username" placeholder="Username" style="display:none" />
+    <input type="email" id="email" placeholder="Email" />
+    <div class="input-field" style="position: relative;">
+      <input type="password" id="password" placeholder="Password" style="padding-right: 40px;" />
+      <span onclick="togglePassword()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" id="togglePassword">👁️</span>
+    </div>    
+    <button onclick="handleSubmit()">Submit</button>
+    <div class="toggle" onclick="toggleForm()">Don't have an account? Register</div>
+    <div class="dark-switch" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</div>
+  </div>
+  <div class="toast" id="toast"></div>
+<script>
+  let isLogin = true;
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    let adminPassword = localStorage.getItem("adminPassword") || "admin123";
+
+    function toggleForm() {
+      isLogin = !isLogin;
+      document.getElementById("formTitle").innerText = isLogin ? "Login" : "Register";
+      document.getElementById("username").style.display = isLogin ? "none" : "block";
+      document.querySelector(".toggle").innerText = isLogin ? "Don't have an account? Register" : "Already have an account? Login";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+    }
+
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      const toggleIcon = document.getElementById("togglePassword");
+      const isHidden = passwordInput.type === "password";
+      passwordInput.type = isHidden ? "text" : "password";
+      toggleIcon.innerText = isHidden ? "🙈" : "👁️";
+    }
+
+    function toast(msg, isErr=false) {
+      const toast = document.getElementById("toast");
+      toast.style.background = isErr ? "crimson" : "green";
+      toast.innerText = msg;
+      toast.style.display = "block";
+      setTimeout(() => toast.style.display = "none", 3000);
+    }
+
+    function handleSubmit() {
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      
+      console.log("Entered Username:", username);
+      console.log("Entered Email:", email);
+      console.log("Entered Password:", password);
+    
+      if (!email || !password || (!isLogin && !username)) return toast("All fields required", true);
+    
+      if (isLogin) {
+        if (email === "admin@admin.com") {
+          if (password === adminPassword) {
+            console.log("Admin credentials correct");
+            localStorage.setItem("loggedIn", JSON.stringify({ role: "admin", email }));
+            location.href = "admin.html";
+          } else {
+            toast("Invalid admin credentials", true);
+          }
+        } else {
+          const user = users.find(u => u.email === email && u.password === password);
+          if (user) {
+            localStorage.setItem("loggedIn", JSON.stringify({ role: "user", ...user }));
+            location.href = "dashboard.html";
+          } else {
+            toast("Invalid login", true);
+          }
+        }
+      } else {
+        // Register new user
+        const existingUser = users.find(u => u.email === email);
+        if (existingUser) {
+          return toast("Email already registered", true);
+        }
+        const newUser = { username, email, password };
+        users.push(newUser);
+        localStorage.setItem("users", JSON.stringify(users));
+        toast("Registration successful!");
+        toggleForm();  // Switch to login form after registration
+      }
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("darkMode") === "true") document.body.classList.add("dark-mode");
+    }
+</script>
+</body>
+</html>

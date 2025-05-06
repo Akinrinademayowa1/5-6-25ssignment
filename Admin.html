@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f0f0f0;
+      transition: background 0.4s, color 0.4s;
+    }
+    .dark-mode {
+      background-color: #1a1a2e;
+      color: white;
+    }
+    header {
+      padding: 1rem;
+      background: linear-gradient(to right, #4e54c8, #8f94fb);
+      color: white;
+      text-align: center;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    .controls, .change-password {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4e54c8;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #3134b0;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+    li {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dark-mode li {
+      background-color: #2d2d44;
+    }
+    input {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome, Admin</h1>
+  </header>
+  <div class="container">
+    <h2>Manage Registered Users</h2>
+    <ul id="userList"></ul>
+
+    <div class="change-password">
+      <input type="password" id="newAdminPass" placeholder="Change Admin Password" />
+      <button onclick="changeAdminPass()">Update</button>
+    </div>
+
+    <div class="controls">
+      <button onclick="toggleDark()">🌙 Dark Mode</button>
+      <button onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <script>
+    const userList = document.getElementById("userList");
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    const currentUser = JSON.parse(localStorage.getItem("loggedIn") || "{}");
+
+    if (currentUser.role !== "admin") {
+      alert("Unauthorized Access");
+      location.href = "index.html";
+    }
+
+    function renderUsers() {
+      userList.innerHTML = "";
+      users.forEach(user => {
+        const li = document.createElement("li");
+        li.textContent = `${user.username} (${user.email})`;
+
+        // Create delete button for each user
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.style.backgroundColor = "red";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.onclick = () => deleteUser(user.email);
+
+        // Append the delete button next to the user's info
+        li.appendChild(deleteBtn);
+        userList.appendChild(li);
+      });
+    }
+
+    function deleteUser(email) {
+      // Filter out the user with the matching email
+      users = users.filter(user => user.email !== email);
+      
+      // Update the users array in localStorage
+      localStorage.setItem("users", JSON.stringify(users));
+      
+      // Re-render the user list
+      renderUsers();
+      
+      alert("User deleted successfully.");
+    }
+
+    function changeAdminPass() {
+      const newPass = document.getElementById("newAdminPass").value;
+      if (newPass.length < 4) return alert("Password too short");
+      localStorage.setItem("adminPassword", newPass);
+      alert("Password changed!");
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      location.href = "enhanced_index.html";
+    }
+
+    function toggleDark() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    renderUsers();
+  </script>
+</body>
+</html>
