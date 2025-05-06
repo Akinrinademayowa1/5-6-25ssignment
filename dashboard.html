@@ -10,6 +10,7 @@
       margin: 0; padding: 0;
       background-color: #f8f9fa;
       transition: background 0.4s, color 0.4s;
+      overflow-x: hidden;
     }
     .dark-mode {
       background-color: #1a1a2e;
@@ -20,53 +21,109 @@
       background: linear-gradient(to right, #43cea2, #185a9d);
       color: white;
       text-align: center;
+      position: relative;
     }
-    .container {
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
-    }
-    .controls, .change-password {
-      margin-top: 1.5rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    button {
-      padding: 10px 16px;
+    .menu-toggle {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      font-size: 1.5rem;
+      background: none;
       border: none;
-      border-radius: 5px;
-      background-color: #185a9d;
       color: white;
       cursor: pointer;
-      transition: 0.3s;
     }
-    button:hover {
-      background-color: #114d86;
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+
+      background-color: #185a9d;
+      color: white;
+      padding: 2rem 1rem;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+      transition: left 0.3s ease-in-out;
+      z-index: 1000;
     }
+    .sidebar.open {
+      left: 0;
+    }
+    .sidebar button, .sidebar input {
+      padding: 10px;
+      margin-top: 3rem;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .sidebar button {
+      background-color: white;
+      color: #185a9d;
+      cursor: pointer;
+    }
+    .sidebar button:hover {
+      background-color: #eee;
+    }
+    .main {
+        padding: 2rem;
+        max-width: 600px;
+        margin: auto;
+        transition: margin-left 0.3s ease-in-out;
+        width: 100%;
+        position: relative;  /* Ensure it stays in the normal flow */
+      }
+      .sidebar.open ~ .main {
+        margin-left: 0;  /* No change to the main content when sidebar opens */
+      }
+      button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 5px;
+        background-color: #4e54c8;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+  
+      button:hover {
+        background-color: #3134b0;
+      }
     input {
       padding: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
+    .menu-toggle {
+        position: absolute;
+        left: 1rem;
+        top: 1rem;
+        font-size: 1.5rem;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        z-index: 1101; /* Set a higher z-index to make sure it stays on top */
+      }
   </style>
 </head>
 <body>
   <header>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
     <h1 id="greeting">Welcome!</h1>
   </header>
-  <div class="container">
-    <p>This is your personalized dashboard. You can update your password or logout.</p>
 
+  <div class="sidebar" id="sidebar">
     <div class="change-password">
       <input type="password" id="newPass" placeholder="Change Your Password" />
       <button onclick="changePassword()">Update</button>
     </div>
+    <button onclick="toggleDark()">🌙 Dark Mode</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
 
-    <div class="controls">
-      <button onclick="toggleDark()">🌙 Dark Mode</button>
-      <button onclick="logout()">🚪 Logout</button>
-    </div>
+  <div class="main">
+    <p>This is your personalized dashboard. You can update your password or logout.</p>
   </div>
 
   <script>
@@ -75,10 +132,16 @@
 
     if (!user || user.role !== "user") {
       alert("Unauthorized Access");
-      location.href = "index.html";
+      location.href = "enhanced_index.html";
     }
 
     greeting.textContent = `Welcome, ${user.username}`;
+
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('open');
+      }
+      
 
     function changePassword() {
       const newPass = document.getElementById("newPass").value;
