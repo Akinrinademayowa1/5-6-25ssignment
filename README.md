@@ -129,8 +129,6 @@ User Authentication: Credentials are stored in local storage after a successful 
 
 Session Persistence: The user remains logged in even after page reloads or browser restarts, as long as their session is stored in local storage. 🔄
 
-This updated documentation now includes the Logout Option for both users and admins, allowing them to end their sessions securely. Let me know if you need any further adjustments!
-
 
 
 
