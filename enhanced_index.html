@@ -184,7 +184,7 @@
           if (password === adminPassword) {
             console.log("Admin credentials correct");
             localStorage.setItem("loggedIn", JSON.stringify({ role: "admin", email }));
-            location.href = "admin.html";
+            location.href = "Admin.html";
           } else {
             toast("Invalid admin credentials", true);
           }
