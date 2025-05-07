@@ -184,7 +184,7 @@
           if (password === adminPassword) {
             console.log("Admin credentials correct");
             localStorage.setItem("loggedIn", JSON.stringify({ role: "admin", email }));
-            location.href = "Admin.html";
+            location.href = "admin.html";
           } else {
             toast("Invalid admin credentials", true);
           }
@@ -201,7 +201,7 @@
         // Register new user
         const existingUser = users.find(u => u.email === email);
         if (existingUser) {
-          return toast("Email already registered", true);
+          return toast("Email already ```registered", true);
         }
         const newUser = { username, email, password };
         users.push(newUser);
